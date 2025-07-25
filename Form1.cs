@@ -9,10 +9,6 @@ namespace Coach
 {
     public partial class Form1 : Form
     {
-        //MD5 hash
-        string SteamHash = "bb0d932f267c0ce1b1045e68a3d12ffb"; //Steam Build ID: 4940658 (Tested on August 2. 2024)
-        string EpicHash1 = "1d91aa77a1fdb86673a501696c8ad23c"; //EPIC STORE Version (Tested on August 2. 2024)
-        string currenthash = "";
 
         [Flags]
         public enum ProcessAccessFlags : uint
@@ -73,10 +69,7 @@ namespace Coach
                 Hash hash = new Hash();
 
                 process = proc[0];
-                currenthash = hash.GetHash(process.Modules[0].FileName);
-
-                if (currenthash == SteamHash || currenthash == EpicHash1)
-                {
+                      
 
                     string _aipath = process.Modules[0].FileName.Replace("AI.exe", "");
                     pathforgamefolder = _aipath;
@@ -97,17 +90,17 @@ namespace Coach
                         if (process.ProcessName == "AI")
                         {
                             IntPtr pointer = (IntPtr)0x0;
-                            if (currenthash == SteamHash)
-                            {
 
-                                pointer = GetPointerAddress(new int[] { 0x88 }, 0x12F0C88, (IntPtr)0x24);
+                            if(File.Exists(pathforgamefolder + "STEAM_API.DLL"))
+                            { 
+                               pointer = GetPointerAddress(new int[] { 0x88 }, 0x12F0C88, (IntPtr)0x24);
                             }
-                            else if (currenthash == EpicHash1)
+                            else if(File.Exists(pathforgamefolder + "EOSSDK-Win32-Shipping.dll"))
                             {
                                 pointer = GetPointerAddress(new int[] { 0x88 }, 0x130D1A8, (IntPtr)0x24);
                             }
 
-                            byte[] tempbuffer;
+                        byte[] tempbuffer;
                             int bytesRead;
 
                             tempbuffer = ReadMemory(process, pointer, 12, out bytesRead);
@@ -371,12 +364,7 @@ namespace Coach
                     war.Show();
 
                     this.WindowState = FormWindowState.Minimized;
-                }
-                else
-                {
-                    MessageBox.Show("You are running an unsupported version of the game!\r\n\r\nOnly EPIC or Steam version of the game tested before this date is working. (Tested on August 2nd 2024)", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Environment.Exit(0);
-                }
+ 
 
             }
 
@@ -586,15 +574,17 @@ namespace Coach
             {
                 if (process.ProcessName == "AI")
                 {
-                    if (currenthash == SteamHash)
-                    {
 
+
+                    if (File.Exists(pathforgamefolder + "STEAM_API.DLL"))
+                    {
                         WriteMem(process, new byte[] { 0x3, 0x0, 0x0, 0x0, 0x1 }, GetPointerAddress(new int[] { 0x44 }, 0x12F0C88, (IntPtr)0x39C));
                     }
-                    else if (currenthash == EpicHash1)
+                    else if (File.Exists(pathforgamefolder + "EOSSDK-Win32-Shipping.dll"))
                     {
                         WriteMem(process, new byte[] { 0x3, 0x0, 0x0, 0x0, 0x1 }, GetPointerAddress(new int[] { 0x18 }, 0x1253E5C, (IntPtr)0xD0C));
                     }
+
                     btnHackerTool.Text = "Done!";
                 }
                 else
@@ -616,11 +606,11 @@ namespace Coach
             {
                 if (process.ProcessName == "AI")
                 {
-                    if (currenthash == SteamHash)
+                    if (File.Exists(pathforgamefolder + "STEAM_API.DLL"))
                     {
                         WriteMem(process, new byte[] { 0x3, 0x0, 0x0, 0x0, 0x1 }, GetPointerAddress(new int[] { 0x44 }, 0x12F0C88, (IntPtr)0x394));
                     }
-                    else if (currenthash == EpicHash1)
+                    else if (File.Exists(pathforgamefolder + "EOSSDK-Win32-Shipping.dll"))
                     {
                         WriteMem(process, new byte[] { 0x3, 0x0, 0x0, 0x0, 0x1 }, GetPointerAddress(new int[] { 0x18 }, 0x1253E5C, (IntPtr)0xD04));
                     }
@@ -669,11 +659,12 @@ namespace Coach
                         tempbuffer = new byte[] { 0x4, 0x0, 0x0, 0x0, 0x4 };
                     }
 
-                    if (currenthash == SteamHash)
+
+                    if (File.Exists(pathforgamefolder + "STEAM_API.DLL"))
                     {
                         WriteMem(process, tempbuffer, GetPointerAddress(new int[] { 0x88 }, 0x12F0C88, (IntPtr)0x24));
                     }
-                    else if (currenthash == EpicHash1)
+                    else if (File.Exists(pathforgamefolder + "EOSSDK-Win32-Shipping.dll"))
                     {
                         WriteMem(process, tempbuffer, GetPointerAddress(new int[] { 0x88 }, 0x130D1A8, (IntPtr)0x24));
                     }
@@ -697,16 +688,15 @@ namespace Coach
             {
                 if (process.ProcessName == "AI")
                 {
-                    if(currenthash == SteamHash)
+
+                    if (File.Exists(pathforgamefolder + "STEAM_API.DLL"))
                     {
                         WriteMem(process, new byte[] { 0x1 }, GetPointerAddress(new int[] { 0x44 }, 0x12F0C88, (IntPtr)0x390));
                     }
-                    else if(currenthash == EpicHash1)
+                    else if (File.Exists(pathforgamefolder + "EOSSDK-Win32-Shipping.dll"))
                     {
-
                         WriteMem(process, new byte[] { 0x1 }, GetPointerAddress(new int[] { 0x18 }, 0x1253E5C, (IntPtr)0xD00));
                     }
-
                     
                     btnEnableGasMask.Text = "Done!";
                 }
